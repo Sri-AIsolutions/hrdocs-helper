@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { Session, User, SupabaseClient } from "@supabase/supabase-js";
+import type { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AuthCtx {
   user: User | null;
@@ -13,23 +14,17 @@ const Ctx = createContext<AuthCtx>({ user: null, session: null, loading: true, s
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [client, setClient] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
-    let unsub: (() => void) | undefined;
-    (async () => {
-      const { supabase } = await import("@/integrations/supabase/client");
-      setClient(supabase);
-      const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
-        setSession(s);
-        setLoading(false);
-      });
-      unsub = () => sub.subscription.unsubscribe();
-      const { data } = await supabase.auth.getSession();
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, s) => {
+      setSession(s);
+      setLoading(false);
+    });
+    supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
-    })();
-    return () => unsub?.();
+    });
+    return () => sub.subscription.unsubscribe();
   }, []);
 
   return (
@@ -38,9 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user: session?.user ?? null,
         session,
         loading,
-        signOut: async () => {
-          await client?.auth.signOut();
-        },
+        signOut: async () => { await supabase.auth.signOut(); },
       }}
     >
       {children}
