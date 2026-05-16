@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as GenerateWarningLetterRouteImport } from './routes/generate.warning-letter'
 import { Route as GenerateOfferLetterRouteImport } from './routes/generate.offer-letter'
 import { Route as GenerateLeavePolicyRouteImport } from './routes/generate.leave-policy'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
@@ -23,6 +24,11 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GenerateWarningLetterRoute = GenerateWarningLetterRouteImport.update({
+  id: '/generate/warning-letter',
+  path: '/generate/warning-letter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GenerateOfferLetterRoute = GenerateOfferLetterRouteImport.update({
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/api/generate': typeof ApiGenerateRoute
   '/generate/leave-policy': typeof GenerateLeavePolicyRoute
   '/generate/offer-letter': typeof GenerateOfferLetterRoute
+  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/api/generate': typeof ApiGenerateRoute
   '/generate/leave-policy': typeof GenerateLeavePolicyRoute
   '/generate/offer-letter': typeof GenerateOfferLetterRoute
+  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,6 +70,7 @@ export interface FileRoutesById {
   '/api/generate': typeof ApiGenerateRoute
   '/generate/leave-policy': typeof GenerateLeavePolicyRoute
   '/generate/offer-letter': typeof GenerateOfferLetterRoute
+  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,6 +80,7 @@ export interface FileRouteTypes {
     | '/api/generate'
     | '/generate/leave-policy'
     | '/generate/offer-letter'
+    | '/generate/warning-letter'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -78,6 +88,7 @@ export interface FileRouteTypes {
     | '/api/generate'
     | '/generate/leave-policy'
     | '/generate/offer-letter'
+    | '/generate/warning-letter'
   id:
     | '__root__'
     | '/'
@@ -85,6 +96,7 @@ export interface FileRouteTypes {
     | '/api/generate'
     | '/generate/leave-policy'
     | '/generate/offer-letter'
+    | '/generate/warning-letter'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -93,6 +105,7 @@ export interface RootRouteChildren {
   ApiGenerateRoute: typeof ApiGenerateRoute
   GenerateLeavePolicyRoute: typeof GenerateLeavePolicyRoute
   GenerateOfferLetterRoute: typeof GenerateOfferLetterRoute
+  GenerateWarningLetterRoute: typeof GenerateWarningLetterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -109,6 +122,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/generate/warning-letter': {
+      id: '/generate/warning-letter'
+      path: '/generate/warning-letter'
+      fullPath: '/generate/warning-letter'
+      preLoaderRoute: typeof GenerateWarningLetterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/generate/offer-letter': {
@@ -141,6 +161,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGenerateRoute: ApiGenerateRoute,
   GenerateLeavePolicyRoute: GenerateLeavePolicyRoute,
   GenerateOfferLetterRoute: GenerateOfferLetterRoute,
+  GenerateWarningLetterRoute: GenerateWarningLetterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
