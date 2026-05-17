@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenerateDocTypeRouteImport } from './routes/generate.$docType'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -38,12 +44,14 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
 }
@@ -51,26 +59,46 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/api/generate' | '/generate/$docType'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/settings'
+    | '/api/generate'
+    | '/generate/$docType'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/api/generate' | '/generate/$docType'
-  id: '__root__' | '/' | '/auth' | '/api/generate' | '/generate/$docType'
+  to: '/' | '/auth' | '/settings' | '/api/generate' | '/generate/$docType'
+  id:
+    | '__root__'
+    | '/'
+    | '/auth'
+    | '/settings'
+    | '/api/generate'
+    | '/generate/$docType'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  SettingsRoute: typeof SettingsRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
   GenerateDocTypeRoute: typeof GenerateDocTypeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -105,6 +133,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  SettingsRoute: SettingsRoute,
   ApiGenerateRoute: ApiGenerateRoute,
   GenerateDocTypeRoute: GenerateDocTypeRoute,
 }
