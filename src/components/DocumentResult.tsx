@@ -3,10 +3,21 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Copy, Download, Loader2 } from "lucide-react";
 import { toast } from "sonner";
-import { downloadPdf } from "@/lib/pdf";
+import { downloadPdf, type PdfBranding } from "@/lib/pdf";
 
-export function DocumentResult({ text, loading, filename }: { text: string; loading: boolean; filename: string }) {
+export function DocumentResult({
+  text,
+  loading,
+  filename,
+  branding,
+}: {
+  text: string;
+  loading: boolean;
+  filename: string;
+  branding?: PdfBranding;
+}) {
   const [copying, setCopying] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   if (loading) {
     return (
@@ -40,8 +51,21 @@ export function DocumentResult({ text, loading, filename }: { text: string; load
           >
             <Copy className="w-4 h-4 mr-1" /> Copy
           </Button>
-          <Button size="sm" onClick={() => downloadPdf(text, filename)}>
-            <Download className="w-4 h-4 mr-1" /> Download PDF
+          <Button
+            size="sm"
+            disabled={downloading}
+            onClick={async () => {
+              setDownloading(true);
+              try {
+                await downloadPdf(text, filename, branding);
+              } catch {
+                toast.error("Could not generate PDF");
+              } finally {
+                setDownloading(false);
+              }
+            }}
+          >
+            <Download className="w-4 h-4 mr-1" /> {downloading ? "Preparing…" : "Download PDF"}
           </Button>
         </div>
       </div>
