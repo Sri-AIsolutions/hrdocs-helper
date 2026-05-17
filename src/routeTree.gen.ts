@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as DocumentsRouteImport } from './routes/documents'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as GenerateDocTypeRouteImport } from './routes/generate.$docType'
@@ -18,6 +19,11 @@ import { Route as ApiGenerateRouteImport } from './routes/api/generate'
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DocumentsRoute = DocumentsRouteImport.update({
+  id: '/documents',
+  path: '/documents',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -44,6 +50,7 @@ const ApiGenerateRoute = ApiGenerateRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/documents': typeof DocumentsRoute
   '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/documents': typeof DocumentsRoute
   '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/documents': typeof DocumentsRoute
   '/settings': typeof SettingsRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
@@ -68,15 +77,23 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/documents'
     | '/settings'
     | '/api/generate'
     | '/generate/$docType'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/settings' | '/api/generate' | '/generate/$docType'
+  to:
+    | '/'
+    | '/auth'
+    | '/documents'
+    | '/settings'
+    | '/api/generate'
+    | '/generate/$docType'
   id:
     | '__root__'
     | '/'
     | '/auth'
+    | '/documents'
     | '/settings'
     | '/api/generate'
     | '/generate/$docType'
@@ -85,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthRoute: typeof AuthRoute
+  DocumentsRoute: typeof DocumentsRoute
   SettingsRoute: typeof SettingsRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
   GenerateDocTypeRoute: typeof GenerateDocTypeRoute
@@ -97,6 +115,13 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/documents': {
+      id: '/documents'
+      path: '/documents'
+      fullPath: '/documents'
+      preLoaderRoute: typeof DocumentsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -133,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthRoute: AuthRoute,
+  DocumentsRoute: DocumentsRoute,
   SettingsRoute: SettingsRoute,
   ApiGenerateRoute: ApiGenerateRoute,
   GenerateDocTypeRoute: GenerateDocTypeRoute,
