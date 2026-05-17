@@ -11,9 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as GenerateWarningLetterRouteImport } from './routes/generate.warning-letter'
-import { Route as GenerateOfferLetterRouteImport } from './routes/generate.offer-letter'
-import { Route as GenerateLeavePolicyRouteImport } from './routes/generate.leave-policy'
 import { Route as GenerateDocTypeRouteImport } from './routes/generate.$docType'
 import { Route as ApiGenerateRouteImport } from './routes/api/generate'
 
@@ -25,21 +22,6 @@ const AuthRoute = AuthRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateWarningLetterRoute = GenerateWarningLetterRouteImport.update({
-  id: '/generate/warning-letter',
-  path: '/generate/warning-letter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateOfferLetterRoute = GenerateOfferLetterRouteImport.update({
-  id: '/generate/offer-letter',
-  path: '/generate/offer-letter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GenerateLeavePolicyRoute = GenerateLeavePolicyRouteImport.update({
-  id: '/generate/leave-policy',
-  path: '/generate/leave-policy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GenerateDocTypeRoute = GenerateDocTypeRouteImport.update({
@@ -58,18 +40,12 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
-  '/generate/leave-policy': typeof GenerateLeavePolicyRoute
-  '/generate/offer-letter': typeof GenerateOfferLetterRoute
-  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
-  '/generate/leave-policy': typeof GenerateLeavePolicyRoute
-  '/generate/offer-letter': typeof GenerateOfferLetterRoute
-  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,38 +53,13 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/api/generate': typeof ApiGenerateRoute
   '/generate/$docType': typeof GenerateDocTypeRoute
-  '/generate/leave-policy': typeof GenerateLeavePolicyRoute
-  '/generate/offer-letter': typeof GenerateOfferLetterRoute
-  '/generate/warning-letter': typeof GenerateWarningLetterRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/auth'
-    | '/api/generate'
-    | '/generate/$docType'
-    | '/generate/leave-policy'
-    | '/generate/offer-letter'
-    | '/generate/warning-letter'
+  fullPaths: '/' | '/auth' | '/api/generate' | '/generate/$docType'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/auth'
-    | '/api/generate'
-    | '/generate/$docType'
-    | '/generate/leave-policy'
-    | '/generate/offer-letter'
-    | '/generate/warning-letter'
-  id:
-    | '__root__'
-    | '/'
-    | '/auth'
-    | '/api/generate'
-    | '/generate/$docType'
-    | '/generate/leave-policy'
-    | '/generate/offer-letter'
-    | '/generate/warning-letter'
+  to: '/' | '/auth' | '/api/generate' | '/generate/$docType'
+  id: '__root__' | '/' | '/auth' | '/api/generate' | '/generate/$docType'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,9 +67,6 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   ApiGenerateRoute: typeof ApiGenerateRoute
   GenerateDocTypeRoute: typeof GenerateDocTypeRoute
-  GenerateLeavePolicyRoute: typeof GenerateLeavePolicyRoute
-  GenerateOfferLetterRoute: typeof GenerateOfferLetterRoute
-  GenerateWarningLetterRoute: typeof GenerateWarningLetterRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,27 +83,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/generate/warning-letter': {
-      id: '/generate/warning-letter'
-      path: '/generate/warning-letter'
-      fullPath: '/generate/warning-letter'
-      preLoaderRoute: typeof GenerateWarningLetterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/generate/offer-letter': {
-      id: '/generate/offer-letter'
-      path: '/generate/offer-letter'
-      fullPath: '/generate/offer-letter'
-      preLoaderRoute: typeof GenerateOfferLetterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/generate/leave-policy': {
-      id: '/generate/leave-policy'
-      path: '/generate/leave-policy'
-      fullPath: '/generate/leave-policy'
-      preLoaderRoute: typeof GenerateLeavePolicyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/generate/$docType': {
@@ -180,10 +107,17 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   ApiGenerateRoute: ApiGenerateRoute,
   GenerateDocTypeRoute: GenerateDocTypeRoute,
-  GenerateLeavePolicyRoute: GenerateLeavePolicyRoute,
-  GenerateOfferLetterRoute: GenerateOfferLetterRoute,
-  GenerateWarningLetterRoute: GenerateWarningLetterRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
