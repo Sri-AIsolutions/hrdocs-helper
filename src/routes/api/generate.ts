@@ -3,20 +3,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 
 const BodySchema = z.object({
-  docType: z.enum(["offer", "leave", "warning"]),
+  docType: z.string().min(1).max(40),
+  title: z.string().min(1).max(200),
+  promptInstructions: z.string().min(1).max(2000),
+  language: z.string().min(1).max(40).default("English"),
   fields: z.record(z.string(), z.union([z.string(), z.number()])),
+  companyProfile: z
+    .object({
+      companyName: z.string().max(200).optional(),
+      address: z.string().max(500).optional(),
+      hrManagerName: z.string().max(200).optional(),
+    })
+    .optional(),
 });
-
-function buildPrompt(docType: "offer" | "leave" | "warning", fields: Record<string, string | number>) {
-  const f = JSON.stringify(fields, null, 2);
-  if (docType === "offer") {
-    return `You are an HR document expert for Indian companies. Generate a professional offer letter using Indian labour law standards based on these details: ${f}. Format it cleanly with proper sections (Letterhead, Date, Subject, Body covering position, compensation in INR, joining date, probation, work location, confidentiality, governing law, and a Signature block).`;
-  }
-  if (docType === "leave") {
-    return `You are an HR document expert for Indian companies. Draft a complete employee Leave Policy compliant with Indian labour law standards (Shops & Establishments Acts and Factories Act where applicable) based on these details: ${f}. Cover types of leave (casual, sick, earned/privileged), accrual, carry forward and encashment, holidays, application procedure, approval workflow, leave without pay, and policy review. Format cleanly with numbered sections.`;
-  }
-  return `You are an HR document expert for Indian companies. Generate a formal Warning Letter aligned with Indian labour law and principles of natural justice based on these details: ${f}. Include date, employee details, subject, factual description of the incident, prior discussions if any, expected corrective action, consequences of repeat behaviour, and acknowledgement section. Keep tone professional and neutral. Format cleanly with proper sections.`;
-}
 
 export const Route = createFileRoute("/api/generate")({
   server: {
@@ -36,7 +35,18 @@ export const Route = createFileRoute("/api/generate")({
         const key = process.env.LOVABLE_API_KEY;
         if (!key) return new Response("Missing LOVABLE_API_KEY", { status: 500 });
 
-        const prompt = buildPrompt(parsed.data.docType, parsed.data.fields);
+        const { title, promptInstructions, language, fields, companyProfile } = parsed.data;
+
+        const profileBlock = companyProfile
+          ? `\n\nCompany on whose behalf this is issued:\nCompany name: ${companyProfile.companyName ?? ""}\nAddress: ${companyProfile.address ?? ""}\nHR Manager: ${companyProfile.hrManagerName ?? ""}`
+          : "";
+
+        const langInstruction =
+          language && language !== "English"
+            ? `Write the ENTIRE document in ${language} language. Use the native script of ${language}. Do not output English except for proper nouns, currency symbols and figures.`
+            : "Write the document in clear professional English.";
+
+        const userPrompt = `Document: ${title}\n\n${promptInstructions}\n\nDetails:\n${JSON.stringify(fields, null, 2)}${profileBlock}\n\nLanguage requirement: ${langInstruction}\n\nFormat cleanly with proper sections. Output only the final document text — no preamble, no explanations, no markdown code fences.`;
 
         const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -47,8 +57,8 @@ export const Route = createFileRoute("/api/generate")({
           body: JSON.stringify({
             model: "google/gemini-3-flash-preview",
             messages: [
-              { role: "system", content: "You are an expert HR document writer for Indian small and medium businesses. Output only the final document text — no preamble, no explanations, no markdown code fences." },
-              { role: "user", content: prompt },
+              { role: "system", content: "You are an expert HR document writer for Indian small and medium businesses. You always follow Indian labour law conventions. Output only the final document text." },
+              { role: "user", content: userPrompt },
             ],
           }),
         });
