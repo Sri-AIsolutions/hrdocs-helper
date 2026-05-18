@@ -1,3 +1,17 @@
+// SSR shim: supabase-js client references `localStorage` at module load.
+// Must run before ANY import that may transitively import the supabase client.
+if (typeof globalThis !== "undefined" && typeof (globalThis as any).localStorage === "undefined") {
+  const mem = new Map<string, string>();
+  (globalThis as any).localStorage = {
+    getItem: (k: string) => (mem.has(k) ? (mem.get(k) as string) : null),
+    setItem: (k: string, v: string) => { mem.set(k, String(v)); },
+    removeItem: (k: string) => { mem.delete(k); },
+    clear: () => { mem.clear(); },
+    key: (i: number) => Array.from(mem.keys())[i] ?? null,
+    get length() { return mem.size; },
+  };
+}
+
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
