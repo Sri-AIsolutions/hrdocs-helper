@@ -1,3 +1,7 @@
+// IMPORTANT: ssr-shims must be the very first import — it installs a
+// `localStorage` global before the supabase client (loaded transitively via
+// the TanStack server entry) evaluates its module body.
+import "./lib/ssr-shims";
 import "./lib/error-capture";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
