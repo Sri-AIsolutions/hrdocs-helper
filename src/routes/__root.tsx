@@ -76,9 +76,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "HRDocs AI — AI HR documents for Indian SMBs" },
       { name: "description", content: "Generate offer letters, leave policies and warning letters tailored to Indian labour law in seconds." },
-      { property: "og:title", content: "HRDocs AI" },
-      { property: "og:description", content: "AI-generated HR documents for Indian SMBs." },
+      { property: "og:title", content: "HRDocs AI — AI HR documents for Indian SMBs" },
+      { property: "og:description", content: "Generate offer letters, leave policies and warning letters tailored to Indian labour law in seconds." },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "HRDocs AI — AI HR documents for Indian SMBs" },
+      { name: "twitter:description", content: "Generate offer letters, leave policies and warning letters tailored to Indian labour law in seconds." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/47b8b1ee-2077-4ee5-8c84-4cb69cfe5071/id-preview-99ed2801--2a138d48-dc07-45b2-9c9b-cc12f35fdae3.lovable.app-1779096371871.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/47b8b1ee-2077-4ee5-8c84-4cb69cfe5071/id-preview-99ed2801--2a138d48-dc07-45b2-9c9b-cc12f35fdae3.lovable.app-1779096371871.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       {
